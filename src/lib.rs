@@ -53,7 +53,6 @@ impl Guest for ExampleFdw {
         Ok(())
     }
 
-
     fn begin_scan(ctx: &Context) -> FdwResult {
         let this = Self::this_mut();
 
@@ -96,7 +95,6 @@ impl Guest for ExampleFdw {
         Ok(())
     }
 
-
     fn iter_scan(ctx: &Context, row: &Row) -> Result<Option<u32>, FdwError> {
         let this = Self::this_mut();
 
@@ -126,6 +124,7 @@ impl Guest for ExampleFdw {
                 let cell = match tgt_col.type_oid() {
                     TypeOid::I64 => src.as_f64().map(|v| Cell::I64(v as _)),
                     TypeOid::String => src.as_str().map(|v| Cell::String(v.to_owned())),
+                    TypeOid::Bool => src.as_bool().map(Cell::Bool),
                     _ => {
                         return Err(format!(
                             "column {} data type is not supported",
