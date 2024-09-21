@@ -125,6 +125,7 @@ impl Guest for ExampleFdw {
                     TypeOid::I64 => src.as_f64().map(|v| Cell::I64(v as _)),
                     TypeOid::String => src.as_str().map(|v| Cell::String(v.to_owned())),
                     TypeOid::Bool => src.as_bool().map(Cell::Bool),
+                    TypeOid::F64 => src.as_f64().map(Cell::F64),
                     _ => {
                         return Err(format!(
                             "column {} data type is not supported",
