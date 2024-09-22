@@ -122,15 +122,35 @@ impl Guest for ExampleFdw {
                 // we only support I64 and String cell types here, add more type
                 // conversions if you need
                 let cell = match tgt_col.type_oid() {
-                    TypeOid::I64 => src.as_f64().map(|v| Cell::I64(v as _)),
-                    TypeOid::String => src.as_str().map(|v| Cell::String(v.to_owned())),
                     TypeOid::Bool => src.as_bool().map(Cell::Bool),
+                    TypeOid::I16 => src.as_i64().map(|v| Cell::I16(v as i16)),
+                    TypeOid::I32 => src.as_i64().map(|v| Cell::I32(v as i32)),
+                    TypeOid::I64 => src.as_i64().map(Cell::I64),
+                    TypeOid::F32 => src.as_f64().map(|v| Cell::F32(v as f32)),
                     TypeOid::F64 => src.as_f64().map(Cell::F64),
+                    TypeOid::String => src.as_str().map(|v| Cell::String(v.to_owned())),
+                    TypeOid::Bytea => src.as_str().map(|v| Cell::Bytea(v.as_bytes().to_vec())),
+                    TypeOid::Date => src.as_str().and_then(|v| v.parse().ok()).map(Cell::Date),
+                    TypeOid::Time => src.as_str().and_then(|v| v.parse().ok()).map(Cell::Time),
+                    TypeOid::Timestamp => src
+                        .as_str()
+                        .and_then(|v| v.parse().ok())
+                        .map(Cell::Timestamp),
+                    TypeOid::TimestampTz => src
+                        .as_str()
+                        .and_then(|v| v.parse().ok())
+                        .map(Cell::TimestampTz),
+                    TypeOid::Interval => src
+                        .as_str()
+                        .and_then(|v| v.parse().ok())
+                        .map(Cell::Interval),
+                    TypeOid::Uuid => src.as_str().and_then(|v| v.parse().ok()).map(Cell::Uuid),
+                    TypeOid::Json => src.as_str().map(|v| Cell::Json(v.to_owned())),
+                    TypeOid::Jsonb => src.as_str().map(|v| Cell::Jsonb(v.to_owned())),
                     _ => {
-                        return Err(format!(
-                            "column {} data type is not supported",
-                            tgt_col_name
-                        ));
+                        return Err(
+                            format!("column {} data type is not supported", tgt_col_name).into(),
+                        );
                     }
                 };
 
